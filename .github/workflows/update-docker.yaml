@@ -3,14 +3,14 @@ name: Build and push Lsky-Pro Docker images
 on:
   schedule:
   - cron: '0 7 * * *'
-  #workflow_dispatch:
-    #inputs:
-      #logLevel:
-        #description: 'Log level'   
-        #required: true
-        #default: 'warning'
-      #tags:
-        #description: 'Test scenario tags'
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'   
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags'
 
 env:
   TZ: Asia/Shanghai 
