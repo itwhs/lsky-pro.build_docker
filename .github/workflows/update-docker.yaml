@@ -1,8 +1,14 @@
 name: Build and push Lsky-Pro Docker images
 
 on:
+  # 任意推送都会触发构建
+  push:
+    branches: [ master ]
+# 定时调度
   schedule:
-  - cron: '0 7 * * *'
+    - cron: "0 0 * * *"
+  # Allows you to run this workflow manually from the Actions tab
+# 可以手动触发
   workflow_dispatch:
     inputs:
       logLevel:
