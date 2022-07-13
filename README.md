@@ -14,8 +14,6 @@ qingjiubaba/lsky-pro:latest
 
 ## 反代HTTPS
 
-如果使用了Nginx反代后，如果出现无法加载图片的问题，可以根据原项目 [#317](https://github.com/lsky-org/lsky-pro/issues/317) 执行以下指令来手动修改容器内`AppServiceProvider.php`文件对于HTTPS的支持
-
 ```bash
 放一个nginx反向代理的虚拟主机配置,只需要修改'***'为你自己主机相关路径和域名即可
 cat >/etc/nginx/conf.d/lsky.conf<<'END'
@@ -69,6 +67,7 @@ server {
 }
 END
 ```
+如果使用了Nginx反代后，如果出现无法加载图片的问题，可以根据原项目 [#317](https://github.com/lsky-org/lsky-pro/issues/317) 执行以下指令来手动修改容器内`AppServiceProvider.php`文件对于HTTPS的支持
 
 ***Tips：将lsky改为自己容器的名字***
 
