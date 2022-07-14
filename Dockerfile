@@ -1,6 +1,7 @@
 FROM php:8.1-apache
 MAINTAINER qingjiubaba <iamwhs@88.com>
 COPY entrypoint.sh /
+COPY ./ /home
 RUN apt update && apt upgrade -y \
     && apt install imagemagick libmagickwand-dev -y \
     && pecl install imagick \
@@ -12,11 +13,11 @@ RUN apt update && apt upgrade -y \
     && echo 'apc.enable_cli=1' >> /usr/local/etc/php/conf.d/docker-php-ext-apcu.ini \
     && echo 'memory_limit=512M' > /usr/local/etc/php/conf.d/memory-limit.ini \
     && mkdir -p /var/www/data \
-    && chown -R www-data:root /var/www \
-    && chmod -R g=u /var/www \
+    && mv /home /var/www/lsky \
+    && mkdir /home \
+    && chown -R www-data:www-data /var/www \
     && chmod a+x /entrypoint.sh
 
-COPY ./ /var/www/lsky/
 COPY ./000-default.conf /etc/apache2/sites-enabled/
 COPY ./docker-php-upload.ini /usr/local/etc/php/conf.d/
 COPY ./opcache-recommended.ini /usr/local/etc/php/conf.d/
