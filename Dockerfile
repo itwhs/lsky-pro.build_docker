@@ -13,6 +13,7 @@ RUN apt update && apt upgrade -y \
     && echo 'apc.enable_cli=1' >> /usr/local/etc/php/conf.d/docker-php-ext-apcu.ini \
     && echo 'memory_limit=512M' > /usr/local/etc/php/conf.d/memory-limit.ini \
     && mkdir -p /var/www/data \
+    && cp -ar /home /var/www/html \
     && mv /home /var/www/lsky \
     && mkdir /home \
     && chown -R www-data:www-data /var/www \
