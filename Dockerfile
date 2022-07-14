@@ -13,7 +13,6 @@ RUN apt update && apt upgrade -y \
     && echo 'apc.enable_cli=1' >> /usr/local/etc/php/conf.d/docker-php-ext-apcu.ini \
     && echo 'memory_limit=512M' > /usr/local/etc/php/conf.d/memory-limit.ini \
     && mkdir -p /var/www/data \
-    && cp -ar /home /var/www/html \
     && mv /home /var/www/lsky \
     && mkdir /home \
     && chown -R www-data:www-data /var/www \
@@ -22,8 +21,8 @@ RUN apt update && apt upgrade -y \
 COPY ./000-default.conf /etc/apache2/sites-enabled/
 COPY ./docker-php-upload.ini /usr/local/etc/php/conf.d/
 COPY ./opcache-recommended.ini /usr/local/etc/php/conf.d/
-WORKDIR /var/www/html
-VOLUME /var/www/html
+WORKDIR /var/www
+VOLUME /var/www
 EXPOSE 80
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apachectl","-D","FOREGROUND"]
