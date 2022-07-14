@@ -14,6 +14,7 @@ RUN apt update && apt upgrade -y \
     && echo 'memory_limit=512M' >/usr/local/etc/php/conf.d/memory-limit.ini \
     && mkdir -p /var/www/data \
     && mv /home /var/www/lsky \
+    && rm -rf /var/www/lsky/.env \
     && mkdir /home \
     && chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www \
