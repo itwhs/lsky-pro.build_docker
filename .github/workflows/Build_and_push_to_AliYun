@@ -1,0 +1,83 @@
+name: Build and push Lsky-Pro Docker images to AliYun
+
+on:
+  # 任意推送都会触发构建
+  push:
+    branches: [ master ]
+# 定时调度
+  schedule:
+    - cron: "0 0 * * 1"
+  # Allows you to run this workflow manually from the Actions tab
+# 可以手动触发
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'   
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags'
+
+env:
+  TZ: Asia/Shanghai 
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download and Unzip Upstream Source Code
+        run: |
+          curl -OL https://github.com/lsky-org/lsky-pro/archive/refs/heads/master.zip
+          unzip *.zip
+          mv ./lsky-pro-master/* ./
+          mv ./lsky-pro-master/.env.example ./
+          rm -rf master.zip lsky-pro-master
+      - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+        with:
+          php-version: '8.1'
+        
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      
+      - name: Install Dependencies
+        run: composer install
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=today::$(date +'%Y%m%d%H%M%S')"
+        
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+        
+      - name: Available platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+        
+      - uses: actions/checkout@v2 # pull代码到运行服务器上
+      - name: Login to Aliyun Container Registry (ACR)
+        uses: aliyun/acr-login@v1 # 使用阿里云镜像服务action
+        with:
+          login-server: registry.cn-hangzhou.aliyuncs.com # 务必正确填写镜像容器服务的登录地址
+          region-id: cn-hangzhou # 务必正确填写镜像容器服务的登录地址
+          username: "${{ secrets.ALIYUN_DOCKER_USERNAME }}" # 引用GitHub repo设置的镜像容器服务用户名
+          password: "${{ secrets.ALIYUN_DOCKER_PASSWORD }}" # 引用GitHub repo设置的镜像容器服务密码
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+# 所需要的体系结构，可以在 Available platforms 步骤中获取所有的可用架构
+          platforms: linux/amd64,linux/386,linux/arm64/v8,linux/arm/v7
+# 镜像推送时间
+          push: ${{ github.event_name != 'pull_request' }}
+# 给清单打上多个标签
+          tags: |
+            registry.cn-hangzhou.aliyuncs.com/${{ secrets.ALIYUN_DOCKER_NAMESPACE }}/lsky-pro:latest
+            registry.cn-hangzhou.aliyuncs.com/${{ secrets.ALIYUN_DOCKER_NAMESPACE }}/lsky-pro:${{ steps.date.outputs.today }}
